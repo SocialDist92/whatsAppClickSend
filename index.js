@@ -3,6 +3,7 @@ const readline = require('readline');
 const { google } = require('googleapis');
 const { exec } = require("child_process");
 const open = require('open');
+const { executionAsyncResource } = require('async_hooks');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
@@ -137,9 +138,11 @@ function listEmail(auth) {
             //console.log(mailBody);
 
             try {
-                await execTerminal('osascript openWhatsApp.scpt')
+                //await execTerminal('osascript openWhatsApp.scpt')
                 open('https://api.whatsapp.com/send/?phone=526143948254&text=Hola%2C+Aparte+un+boleto+de+la+rifa%21%21%0AMAZDA+CX-30+2021%21%21%0A%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%0A%5Cue110%2ABoleto%3A+%22+++number+++%22%2A+%28%22+++extraNumbers.join%28%27%2C+%27%29+++%22%29%0A%0A%2ANombre%3A%2A+%22+++formElements.name.value.toUpperCase%28%29+++%22+%22+++formElements.lastName.value.toUpperCase%28%29+++%22%0A%0A%5Cue125COSTO+BOLETO+%22+++price+++%22%0A%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%0A%2ACLICK+AQU%C3%8D%3A%2A+lottosorteos.com%2Fpagos+Para+ver+cuentas+de+pago%21%0A%0AEl+siguiente+paso+es+enviar+foto+del+comprobante+de+pago+por+aqu%C3%AD&app_absent=0', {app: 'chrome'});
-
+                setTimeout(function () {
+                    execTerminal ("cliclick c:1401,790")
+                }, 10000 ) 
             } catch (error) {
                 throw ('Failed to open WhatsApp');
 
