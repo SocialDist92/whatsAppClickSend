@@ -127,8 +127,44 @@ function listEmail(auth) {
             userId: 'me',
             id: res.data.messages[0].id
         }).then(async (res) => {
-            console.log(res.data.payload.headers);
 
+            const headersArray = res.data.payload.headers
+            let subject = headersArray.filter(header =>
+                header.name == 'Subject'
+            )[0].value
+            //check if it's actual participant mail
+            if (subject.indexOf('|')) {
+                subject = subject.split('|')
+                const name = subject[0]
+                const extraNumbers = subject[1]
+                const year = subject[2]
+                const price = subject[3]
+                const phone = subject[4]
+                const lastName = subject[5]
+                const number = subject[6]
+                console.log(`name: ${name}, extraNumbers: ${extraNumbers},
+                year: ${year}, price: ${price}, phone: ${phone}, lastName: ${lastName}, number: ${number}`)
+
+                try {
+                    await execTerminal('osascript openWhatsApp.scpt')   
+
+                    open(`https://api.whatsapp.com/send/?phone=52${phone}&text=Hola%2C+Aparte+un+boleto+de+la+rifa
+                    %21%21%0AMAZDA+CX-30+2021%21%21%0A%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%
+                    94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%0A%5Cue110%2ABoleto%3A+%22+++
+                    ${number}+++%22%2A+%28%22+++${extraNumbers}%28%27%2C+%27%29+++%22%29%0A%0A%2ANombre%3A
+                    %2A+%22+++${name}%28%29+++%22+%22+++${lastName}%28%29+++%22%0A%0A%5Cue125COSTO+BOLETO+
+                    %22+++${price}+++%22%0A%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94
+                    %E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%0A%2ACLICK+AQU%C3%8D%3A%2A+lottosorteos.
+                    com%2Fpagos+Para+ver+cuentas+de+pago%21%0A%0AEl+siguiente+paso+es+enviar+foto+del+c
+                    omprobante+de+pago+por+aqu%C3%AD&app_absent=0`, {app: 'chrome'});
+                    setTimeout(function () {
+                        //execTerminal ("cliclick c:1401,790")
+                    }, 10000 ) 
+                } catch (error) {
+                    throw ('Failed to open WhatsApp');
+    
+                }
+            }
             /* let body_content = JSON.stringify(res.data.payload.parts[0].body.data);
             let data, buff, text;
             data = body_content;
@@ -137,16 +173,7 @@ function listEmail(auth) {
             // display the result
             //console.log(mailBody);
 
-            try {
-                //await execTerminal('osascript openWhatsApp.scpt')
-                open('https://api.whatsapp.com/send/?phone=526143948254&text=Hola%2C+Aparte+un+boleto+de+la+rifa%21%21%0AMAZDA+CX-30+2021%21%21%0A%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%0A%5Cue110%2ABoleto%3A+%22+++number+++%22%2A+%28%22+++extraNumbers.join%28%27%2C+%27%29+++%22%29%0A%0A%2ANombre%3A%2A+%22+++formElements.name.value.toUpperCase%28%29+++%22+%22+++formElements.lastName.value.toUpperCase%28%29+++%22%0A%0A%5Cue125COSTO+BOLETO+%22+++price+++%22%0A%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%0A%2ACLICK+AQU%C3%8D%3A%2A+lottosorteos.com%2Fpagos+Para+ver+cuentas+de+pago%21%0A%0AEl+siguiente+paso+es+enviar+foto+del+comprobante+de+pago+por+aqu%C3%AD&app_absent=0', {app: 'chrome'});
-                setTimeout(function () {
-                    execTerminal ("cliclick c:1401,790")
-                }, 10000 ) 
-            } catch (error) {
-                throw ('Failed to open WhatsApp');
-
-            }
+            
 
         })
 
