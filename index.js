@@ -148,22 +148,15 @@ function listEmail(auth) {
                 try {
                     await execTerminal('osascript openWhatsApp.scpt')   
 
-                    open(`https://api.whatsapp.com/send/?phone=52${phone}&text=Hola%2C+Aparte+un+boleto+de+la+rifa
-                    %21%21%0AMAZDA+CX-30+2021%21%21%0A%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%
-                    94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%0A%5Cue110%2ABoleto%3A+%22+++
-                    ${number}+++%22%2A+%28%22+++${extraNumbers}%28%27%2C+%27%29+++%22%29%0A%0A%2ANombre%3A
-                    %2A+%22+++${name}%28%29+++%22+%22+++${lastName}%28%29+++%22%0A%0A%5Cue125COSTO+BOLETO+
-                    %22+++${price}+++%22%0A%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94
-                    %E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%0A%2ACLICK+AQU%C3%8D%3A%2A+lottosorteos.
-                    com%2Fpagos+Para+ver+cuentas+de+pago%21%0A%0AEl+siguiente+paso+es+enviar+foto+del+c
-                    omprobante+de+pago+por+aqu%C3%AD&app_absent=0`, {app: 'chrome'});
+                    open(`https://api.whatsapp.com/send/?phone=52${phone}&text=HOLA+${name}%21+Escogiste+el+boleto+${number}+para+la+Mazda+CX-30+2021%EE%84%90%0A%0A%EE%84%A5COSTO%3A+%24699%0APromoci%C3%B3n%3A+2+por+%241250%0A%0APara+ver+cuentas+de+pago+HAZ+CLICK+AQU%C3%8D%3A+lottosorteos.com%2Fpagos%0A%0APor+favor+env%C3%ADa+el+comprobante+de+pago+por+aqu%C3%AD+para+confirmar+y+enviarte+tus+boletos%0AGracias%21&app_absent=0`, {app: 'chrome'});
                     setTimeout(function () {
-                        //execTerminal ("cliclick c:1401,790")
-                    }, 10000 ) 
+                        try{execTerminal("cliclick m:1401,790 w:100 c:1401,790")}catch(err){console.log(err)}
+                    }, 5000 ) 
                 } catch (error) {
                     throw ('Failed to open WhatsApp');
     
                 }
+
             }
             /* let body_content = JSON.stringify(res.data.payload.parts[0].body.data);
             let data, buff, text;
