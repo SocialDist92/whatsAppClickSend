@@ -139,7 +139,7 @@ function listEmail(auth) {
                 const extraNumbers = subject[1]
                 const year = subject[2]
                 const price = subject[3]
-                const phone = subject[4]
+                const phone = '6145284391'//subject[4]
                 const lastName = subject[5]
                 const number = subject[6]
                 console.log(`name: ${name}, extraNumbers: ${extraNumbers},
@@ -150,7 +150,7 @@ function listEmail(auth) {
 
                     open(`https://api.whatsapp.com/send/?phone=52${phone}&text=HOLA+${name}%21+Escogiste+el+boleto+${number}+para+la+Mazda+CX-30+2021%EE%84%90%0A%0A%EE%84%A5COSTO%3A+%24699%0APromoci%C3%B3n%3A+2+por+%241250%0A%0APara+ver+cuentas+de+pago+HAZ+CLICK+AQU%C3%8D%3A+lottosorteos.com%2Fpagos%0A%0APor+favor+env%C3%ADa+el+comprobante+de+pago+por+aqu%C3%AD+para+confirmar+y+enviarte+tus+boletos%0AGracias%21&app_absent=0`, {app: 'chrome'});
                     setTimeout(function () {
-                        try{execTerminal("cliclick m:1401,790 w:100 c:1401,790")}catch(err){console.log(err)}
+                        try{execTerminal("/usr/local/bin/cliclick m:1401,790 w:100 c:1401,790")}catch(err){console.log(err)}
                     }, 5000 ) 
                 } catch (error) {
                     throw ('Failed to open WhatsApp');
