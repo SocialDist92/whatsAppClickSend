@@ -146,15 +146,16 @@ function listEmail(auth) {
                 year: ${year}, price: ${price}, phone: ${phone}, lastName: ${lastName}, number: ${number}`)
 
                 try {
-                    await execTerminal('osascript openWhatsApp.scpt')   
+                    await execTerminal('osascript openWhatsApp.scpt')
 
-                    open(`https://api.whatsapp.com/send/?phone=52${phone}&text=HOLA+${name}%21+Escogiste+el+boleto+${number}+para+la+Mazda+CX-30+2021%EE%84%90%0A%0A%EE%84%A5COSTO%3A+%24699%0APromoci%C3%B3n%3A+2+por+%241250%0A%0APara+ver+cuentas+de+pago+HAZ+CLICK+AQU%C3%8D%3A+lottosorteos.com%2Fpagos%0A%0APor+favor+env%C3%ADa+el+comprobante+de+pago+por+aqu%C3%AD+para+confirmar+y+enviarte+tus+boletos%0AGracias%21&app_absent=0`, {app: 'chrome'});
-                    setTimeout(function () {
-                        try{execTerminal("/usr/local/bin/cliclick m:1401,790 w:100 c:1401,790")}catch(err){console.log(err)}
-                    }, 5000 ) 
+                    open(`https://api.whatsapp.com/send/?phone=52${phone}&text=HOLA+${name}%21+Escogiste+el+boleto+${number}+para+la+Mazda+CX-30+2021%EE%84%90%0A%0A%EE%84%A5COSTO%3A+%24699%0APromoci%C3%B3n%3A+2+por+%241250%0A%0APara+ver+cuentas+de+pago+HAZ+CLICK+AQU%C3%8D%3A+lottosorteos.com%2Fpagos%0A%0APor+favor+env%C3%ADa+el+comprobante+de+pago+por+aqu%C3%AD+para+confirmar+y+enviarte+tus+boletos%0AGracias%21&app_absent=0`, { app: 'chrome' });
+
+                    //try{execTerminal("/usr/local/bin/cliclick m:1247,770 w:100 c:1247,770")}catch(err){console.log(err)}
+                    await execTerminal('osascript clickSend.scpt')
+
                 } catch (error) {
                     throw ('Failed to open WhatsApp');
-    
+
                 }
 
             }
@@ -166,7 +167,7 @@ function listEmail(auth) {
             // display the result
             //console.log(mailBody);
 
-            
+
 
         })
 
