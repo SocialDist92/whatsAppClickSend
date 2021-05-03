@@ -133,6 +133,7 @@ function listEmail(auth) {
             let subject = headersArray.filter(header =>
                 header.name == 'Subject'
             )[0].value
+            console.log(subject)
             //check if it's actual participant mail
             if (subject.indexOf('|')) {
                 subject = subject.split('|')
@@ -140,16 +141,24 @@ function listEmail(auth) {
                 const extraNumbers = subject[1]
                 const year = subject[2]
                 const price = subject[3]
-                const phone = '6145284391'//subject[4]
+                const phone = subject[4]
                 const lastName = subject[5]
                 const number = subject[6]
                 console.log(`name: ${name}, extraNumbers: ${extraNumbers},
                 year: ${year}, price: ${price}, phone: ${phone}, lastName: ${lastName}, number: ${number}`)
+                const urlMessage = `https://api.whatsapp.com/send/?phone=52${phone}&text=HOLA+${name}%21+Escogiste+un+boleto+para+la+Mazda+CX-30+2021%EE%84%90%0A%0A%2ABoleto+${number}%2A%0AIncluye+sin+costo%3A+${extraNumbers}%0A%0A%2APor+favor+realiza+el+pago+antes+de+48+hrs.+y+env%C3%ADa+el+comprobante+de+pago+por+aqu%C3%AD%2A%0A%0APara+ver+cuentas+de+pago%0A%EE%80%A1%2AHAZ+CLICK+AQU%C3%8D%3A%2A+lottosorteos.com%2Fpagos%0A%0A%EE%84%A5COSTO%3A+%24699%0APromoci%C3%B3n%3A+2+por+%241250%0A%0AGracias%21&app_absent=0`
+                const urlReplaced = urlMessage.replace(/\s/g, '+');
+                const urlReplaced1 = urlReplaced.replace((/[ÁÄ]/g), "A");
+                const urlReplaced2 = urlReplaced1.replace((/[ÉË]/g), "E");
+                const urlReplaced3 = urlReplaced2.replace((/[ÍÏ]/g), "I");
+                const urlReplaced4 = urlReplaced3.replace((/[ÓÖ]/g), "O");
+                const urlReplaced5 = urlReplaced4.replace((/[ÚÜ]/g), "U");
+                console.log(urlReplaced5)
 
                 try {
                     await execTerminal('osascript openWhatsApp.scpt')
 
-                    open(`https://api.whatsapp.com/send/?phone=52${phone}&text=HOLA+${name}%21+Escogiste+el+boleto+${number}+para+la+Mazda+CX-30+2021%EE%84%90%0A%0A%EE%84%A5COSTO%3A+%24699%0APromoci%C3%B3n%3A+2+por+%241250%0A%0APara+ver+cuentas+de+pago+HAZ+CLICK+AQU%C3%8D%3A+lottosorteos.com%2Fpagos%0A%0APor+favor+env%C3%ADa+el+comprobante+de+pago+por+aqu%C3%AD+para+confirmar+y+enviarte+tus+boletos%0AGracias%21&app_absent=0`, { app: 'chrome' });
+                    open(urlReplaced5, { app: 'chrome' });
 
 
                     //await execTerminal('osascript clickSend.scpt')
@@ -160,9 +169,10 @@ function listEmail(auth) {
                 }
 
                 try {
-                    execTerminal("python /Users/ricardolugo/Documents/GitHub/whatsAppClickSend/click.py")
+                    setTimeout(async () => await execTerminal("python /Users/ricardolugo/Documents/GitHub/whatsAppClickSend/click.py"), 1000)
+
                 }
-                catch(error){
+                catch (error) {
                     throw ('Failed to click')
                 }
 

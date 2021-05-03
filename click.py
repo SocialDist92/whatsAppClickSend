@@ -9,5 +9,5 @@ def mouseclick(posx,posy):
         mouseEvent(kCGEventLeftMouseUp, posx,posy);
 ourEvent = CGEventCreate(None); 
 currentpos=CGEventGetLocation(ourEvent);    # Save current mouse position
-mouseclick(20,231);
+mouseclick(1405,782);
 mousemove(int(currentpos.x),int(currentpos.y));  # Restore mouse position
