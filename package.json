@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.17.1",
     "google-auth-library": "^7.0.4",
     "googleapis": "^39.2.0",
     "open": "^8.0.5"

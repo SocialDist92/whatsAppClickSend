@@ -83,9 +83,9 @@ function listLabels(auth) {
         if (err) return console.log('The API returned an error: ' + err);
         const labels = res.data.labels;
         if (labels.length) {
-            console.log('Labels:');
+            //console.log('Labels:');
             labels.forEach((label) => {
-                console.log(`- ${label.name}`);
+                //console.log(`- ${label.name}`);
             });
         } else {
             console.log('No labels found.');
@@ -97,14 +97,14 @@ function execTerminal(commandToDo) {
     return new Promise((resolve, reject) => {
         exec(commandToDo, (error, stdout, stderr) => {
             if (error) {
-                console.log(`error: ${error.message}`);
+
                 return reject(error.message);
             }
             if (stderr) {
-                console.log(`stderr: ${stderr}`);
+
                 return reject(stderr);
             }
-            console.log(`stdout: ${stdout}`);
+
             resolve(stdout)
         });
     })
@@ -133,7 +133,7 @@ function listEmail(auth) {
             let subject = headersArray.filter(header =>
                 header.name == 'Subject'
             )[0].value
-            console.log(subject)
+            //console.log(subject)
             //check if it's actual participant mail
             if (subject.indexOf('|')) {
                 subject = subject.split('|')
@@ -141,11 +141,11 @@ function listEmail(auth) {
                 const extraNumbers = subject[1]
                 const year = subject[2]
                 const price = subject[3]
-                const phone = subject[4]
+                const phone = '6145284391'//subject[4]
                 const lastName = subject[5]
                 const number = subject[6]
-                console.log(`name: ${name}, extraNumbers: ${extraNumbers},
-                year: ${year}, price: ${price}, phone: ${phone}, lastName: ${lastName}, number: ${number}`)
+                //console.log(`name: ${name}, extraNumbers: ${extraNumbers},
+                //year: ${year}, price: ${price}, phone: ${phone}, lastName: ${lastName}, number: ${number}`)
                 const urlMessage = `https://api.whatsapp.com/send/?phone=52${phone}&text=HOLA+${name}%21+Escogiste+un+boleto+para+la+Mazda+CX-30+2021%EE%84%90%0A%0A%2ABoleto+${number}%2A%0AIncluye+sin+costo%3A+${extraNumbers}%0A%0A%2APor+favor+realiza+el+pago+antes+de+48+hrs.+y+env%C3%ADa+el+comprobante+de+pago+por+aqu%C3%AD%2A%0A%0APara+ver+cuentas+de+pago%0A%EE%80%A1%2AHAZ+CLICK+AQU%C3%8D%3A%2A+lottosorteos.com%2Fpagos%0A%0A%EE%84%A5COSTO%3A+%24699%0APromoci%C3%B3n%3A+2+por+%241250%0A%0AGracias%21&app_absent=0`
                 const urlReplaced = urlMessage.replace(/\s/g, '+');
                 const urlReplaced1 = urlReplaced.replace((/[ÁÄ]/g), "A");
@@ -153,7 +153,7 @@ function listEmail(auth) {
                 const urlReplaced3 = urlReplaced2.replace((/[ÍÏ]/g), "I");
                 const urlReplaced4 = urlReplaced3.replace((/[ÓÖ]/g), "O");
                 const urlReplaced5 = urlReplaced4.replace((/[ÚÜ]/g), "U");
-                console.log(urlReplaced5)
+                //console.log(urlReplaced5)
 
                 try {
                     await execTerminal('osascript openWhatsApp.scpt')
@@ -168,13 +168,28 @@ function listEmail(auth) {
 
                 }
 
-                try {
-                    setTimeout(async () => await execTerminal("python /Users/ricardolugo/Documents/GitHub/whatsAppClickSend/click.py"), 1000)
+                let times = 0
+                let readySend = false
+                const nSecondsToWait = 15
+                const checkSend = setInterval(async () => {
+                    const color = await execTerminal("python3 /Users/armandorios/whatsAppClickSend/getColor.py")
+                    times += 1
 
-                }
-                catch (error) {
-                    throw ('Failed to click')
-                }
+                    if (color.trim() === '(146, 149, 152, 255)') {
+                        readySend = true
+                        readyToSendContinue(readySend)
+                        clearInterval(checkSend)
+
+                    }
+
+                    if (times === nSecondsToWait) {
+                        readyToSendContinue(readySend)
+                        clearInterval(checkSend)
+                    }
+                }, 1000)
+
+
+
 
             }
             /* let body_content = JSON.stringify(res.data.payload.parts[0].body.data);
@@ -190,4 +205,8 @@ function listEmail(auth) {
         })
 
     });
+
+    async function readyToSendContinue(ready) {
+        if (ready) await execTerminal("python /Users/armandorios/whatsAppClickSend/click.py")
+    }
 }
