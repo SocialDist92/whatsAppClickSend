@@ -12,6 +12,7 @@
     "express": "^4.17.1",
     "google-auth-library": "^7.0.4",
     "googleapis": "^39.2.0",
-    "open": "^8.0.5"
+    "open": "^8.0.5",
+    "uuid": "^8.3.2"
   }
 }

@@ -133,7 +133,7 @@ function listEmail(auth) {
             let subject = headersArray.filter(header =>
                 header.name == 'Subject'
             )[0].value
-            //console.log(subject)
+            console.log(subject)
             //check if it's actual participant mail
             if (subject.indexOf('|')) {
                 subject = subject.split('|')
@@ -208,5 +208,8 @@ function listEmail(auth) {
 
     async function readyToSendContinue(ready) {
         if (ready) await execTerminal("python /Users/armandorios/whatsAppClickSend/click.py")
+        else {
+            //TODO: Check why not ready and send notification
+        }
     }
 }
