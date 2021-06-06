@@ -1,7 +1,14 @@
 from Quartz.CoreGraphics import * 
 
-send_button_x = 1237
-send_button_y = 777
+import os
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+send_button_x = int(os.environ["SEND_BUTTON_X"])
+send_button_y = int(os.environ["SEND_BUTTON_Y"])
 
 def mouseEvent(type, posx, posy):
         theEvent = CGEventCreateMouseEvent(None, type, (posx,posy), kCGMouseButtonLeft)

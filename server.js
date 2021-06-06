@@ -1,76 +1,13 @@
 /* GMAIL */
 const fs = require('fs')
 const readline = require('readline')
-const { google } = require('googleapis')
+const moment = require('moment')
+
 const { exec } = require("child_process")
 const { v4: uuidv4 } = require('uuid')
 const open = require('open')
+require('dotenv').config()
 
-
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-const TOKEN_PATH = 'token.json'
-
-// Load client secrets from a local file.
-fs.readFile('client_secret.json', (err, content) => {
-    if (err) return console.log('Error loading client secret file:', err)
-    // Authorize a client with credentials, then call the Gmail API.
-    authorize(JSON.parse(content), startServer)
-})
-
-
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
- */
-function authorize(credentials, callback) {
-    const { client_secret, client_id, redirect_uris } = credentials.installed
-    const oAuth2Client = new google.auth.OAuth2(
-        client_id, client_secret, redirect_uris[0])
-
-    // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, (err, token) => {
-        if (err) return getNewToken(oAuth2Client, callback)
-        oAuth2Client.setCredentials(JSON.parse(token))
-        callback(oAuth2Client)
-    })
-}
-
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
- */
-function getNewToken(oAuth2Client, callback) {
-    const authUrl = oAuth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: SCOPES,
-    })
-    console.log('Authorize this app by visiting this url:', authUrl)
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    })
-    rl.question('Enter the code from that page here: ', (code) => {
-        rl.close()
-        oAuth2Client.getToken(code, (err, token) => {
-            if (err) return console.error('Error retrieving access token', err)
-            oAuth2Client.setCredentials(token)
-            // Store the token to disk for later program executions
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-                if (err) return console.error(err)
-                console.log('Token stored to', TOKEN_PATH)
-            })
-            callback(oAuth2Client)
-        })
-    })
-}
 
 function execTerminal(commandToDo) {
     return new Promise((resolve, reject) => {
@@ -90,72 +27,6 @@ function execTerminal(commandToDo) {
 }
 
 
-/**
- * Lists the labels in the user's account.
- *
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-
-//TODO: THIS CAN CAUSE A PROBLEM
-function getLastSubject(auth) {
-    return new Promise((resolve, reject) => {
-
-        const gmail = google.gmail({ version: 'v1', auth })
-        gmail.users.messages.list({
-            userId: 'me',
-            maxResults: 1
-        }, (err, res) => {
-            if (err) reject('The API returned an error: ' + err)
-
-            gmail.users.messages.get({
-                userId: 'me',
-                id: res.data.messages[0].id
-            }).then((res) => {
-
-                const headersArray = res.data.payload.headers
-                let subject = headersArray.filter(header =>
-                    header.name == 'Subject'
-                )[0].value
-                resolve(subject)
-
-
-                /* let body_content = JSON.stringify(res.data.payload.parts[0].body.data)
-                let data, buff, text
-                data = body_content
-                buff = new Buffer.from(data, "base64")
-                mailBody = buff.toString() */
-                // display the result
-                //console.log(mailBody)
-
-
-
-            })
-
-        })
-    })
-
-}
-
-function createNotification(subject) {
-
-    subject = subject.split('|')
-
-    const notification = {
-        name: subject[0],
-        extraNumbers: subject[1],
-        year: subject[2],
-        price: subject[3],
-        phone: '6145284391',//subject[4],
-        lastName: subject[5],
-        number: subject[6],
-        id: uuidv4()//subject[7],
-    }
-
-
-    return notification
-
-}
-
 function startWhatsAppProcess(notification) {
     return new Promise(async (resolve, reject) => {
 
@@ -167,9 +38,29 @@ function startWhatsAppProcess(notification) {
         const lastName = notification.lastName
         const number = notification.number
         const id = notification.id
+        const notificationType = notification.notificationType
+        let urlMessage
+        switch (notificationType) {
+            case 'notification':
+                urlMessage = `https://api.whatsapp.com/send/?phone=52${phone}&text=
+                HOLA+${name}%21+Escogiste+un+boleto+para+la+Mazda+CX-30+2021%EE%84%90%0A%0A%2ABoleto+
+                ${number}%2A%0AIncluye+sin+costo%3A+${extraNumbers}%0A%0A%2APor+favor+realiza+el+pago+antes+de+
+                48+hrs.+y+env%C3%ADa+el+comprobante+de+pago+por+aqu%C3%AD%2A%0A%0APara+ver+cuentas+de+pago%0A%EE%80%A1%2A
+                HAZ+CLICK+AQU%C3%8D%3A%2A+lottosorteos.com%2Fpagos%0A%0A%EE%84%A5COSTO%3A+
+                %24699%0APromoci%C3%B3n%3A+2+por+%241250%0A%0AGracias%21&app_absent=0`
+                break
+            case 'reminder':
+                urlMessage = `https://api.whatsapp.com/send/?phone=52${phone}&text=HOLA+${name}+reminder`
+                break
+            case 'reminderTwo':
+                urlMessage = `https://api.whatsapp.com/send/?phone=52${phone}&text=HOLA+${name}+reminderTwo`
+                break
+
+        }
+
         //console.log(`name: ${name}, extraNumbers: ${extraNumbers},
         //year: ${year}, price: ${price}, phone: ${phone}, lastName: ${lastName}, number: ${number}`)
-        const urlMessage = `https://api.whatsapp.com/send/?phone=52${phone}&text=HOLA+${name}%21+Escogiste+un+boleto+para+la+Mazda+CX-30+2021%EE%84%90%0A%0A%2ABoleto+${number}%2A%0AIncluye+sin+costo%3A+${extraNumbers}%0A%0A%2APor+favor+realiza+el+pago+antes+de+48+hrs.+y+env%C3%ADa+el+comprobante+de+pago+por+aqu%C3%AD%2A%0A%0APara+ver+cuentas+de+pago%0A%EE%80%A1%2AHAZ+CLICK+AQU%C3%8D%3A%2A+lottosorteos.com%2Fpagos%0A%0A%EE%84%A5COSTO%3A+%24699%0APromoci%C3%B3n%3A+2+por+%241250%0A%0AGracias%21&app_absent=0`
+
         const urlReplaced = urlMessage.replace(/\s/g, '+')
         const urlReplaced1 = urlReplaced.replace((/[ÁÄ]/g), "A")
         const urlReplaced2 = urlReplaced1.replace((/[ÉË]/g), "E")
@@ -179,7 +70,10 @@ function startWhatsAppProcess(notification) {
         //console.log(urlReplaced5)
 
         try {
-            await execTerminal('osascript openWhatsApp.scpt')
+            if (process.env.OS === 'osx') {
+                await execTerminal('osascript openWhatsApp.scpt')
+            }
+
             open(urlReplaced5, { app: 'chrome' })
 
         } catch (error) {
@@ -193,8 +87,9 @@ function startWhatsAppProcess(notification) {
             const nSecondsToWait = 15
 
             const checkSend = setInterval(async () => {
-                const color = await execTerminal("python3 /Users/armandorios/whatsAppClickSend/getColor.py")
+                const color = await execTerminal(process.env.GET_COLOR_SCRIPT_PATH)
                 times += 1
+                console.log(color)
                 if (color.trim() === '(146, 149, 152, 255)') {
                     resolve(true)
                     clearInterval(checkSend)
@@ -211,7 +106,7 @@ function startWhatsAppProcess(notification) {
         if (readySend) {
             setTimeout(
                 async () => {
-                    await execTerminal("python /Users/armandorios/whatsAppClickSend/click.py")
+                    await execTerminal(process.env.CLICK_SCRIPT_PATH)
 
                     resolve('success')
                 }
@@ -231,71 +126,170 @@ function startWhatsAppProcess(notification) {
 }
 
 /* SERVER */
-function startServer(auth) {
+
+async function startServer() {
     const express = require('express')
+    const bodyParser = require('body-parser')
+    const cors = require('cors')
+    const mongoose = require('mongoose');
+    const Schema = mongoose.Schema;
+
+
     const app = express()
-
-
+    app.use(bodyParser.json())
+    app.use(cors())
 
     let queue = []
     let failedNotifications = []
 
+    /* DB */
+    await mongoose.connect('mongodb://localhost/notifications', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        useCreateIndex: true
+    });
+
+    const notificationSchema = new Schema({
+        name: String,
+        extraNumbers: Array,
+        year: String,
+        price: String,
+        phone: String,
+        lastName: String,
+        number: String,
+        notificationType: String,
+        lastExecute: Date
+    });
+
+    const NotificationModel = mongoose.model('Notification', notificationSchema);
+
+
     app.get('/', function (req, res) {
-        res.send('Hello World')
+        return res.send({ mssg: 'Hello World' })
     })
 
     app.post('/new-notification', function (req, res) {
-        getLastSubject(auth).then(
-            subject => {
-                if (subject.indexOf('|')) {
-                    const notification = createNotification(subject)
-
-                    if (queue.length) {
-                        queue.push(notification)
-                        return res.send({
-                            message: 'added to queue',
-                            toProcess: queue.length
-                        })
-
-                    } else {
-                        queue.push(notification)
-
-                        
-                        startWhatsAppProcess(notification).then(
-                            mssg => {
-                                queue = queue.filter(queueNotification => notification.id !== queueNotification.id)                                
-                                checkForQueueToContinue()
-                                addToFailed(notification.id)
-                                return res.send(mssg)
-                            }
-                        ).catch(err => {
-
-                            addToFailed(notification.id)
-                            checkForQueueToContinue()
-                            return res.status(500).send(err)
-                        })
+        console.log(req.body)
 
 
+        /* 
+        body example
+        {
+            "name": "armando",
+            "extraNumbers": ["123", "124"],
+            "year": "2021",
+            "price": "$300",
+            "phone": "6145284391",
+            "lastName": "rios",
+            "number": "1",
+            "notificationType": "notification" // "reminder", "reminderTwo"
+        }
+     */
 
+        const notification = req.body
+        notification.id = uuidv4()
+        if (queue.length) {
+            queue.push(notification)
+            return res.send({
+                message: 'added to queue',
+                toProcess: queue.length
+            })
+
+        } else {
+            queue.push(notification)
+
+
+            startWhatsAppProcess(notification).then(
+                async mssg => {
+                    queue = queue.filter(queueNotification => notification.id !== queueNotification.id)
+
+                    checkForQueueToContinue()
+                    addToFailed(notification.id)
+
+                    try {
+                        const date = new Date()
+
+                        notification.lastExecute = roundDate(date)
+                        await dbUpdate(notification)
+                        return res.send(mssg)
                     }
-                } else {
-                    return res.status(500).send('Not register email')
+                    catch (error) {
+                        return res.status(500).send(error)
+                    }
+
+
+
+
+
                 }
+            ).catch(err => {
+
+                addToFailed(notification.id)
+                checkForQueueToContinue()
+                return res.status(500).send(err)
+            })
+
+
+
+        }
 
 
 
 
-            }
-        ).catch(err => console.log(err))
+
+
+
 
 
 
     })
+
+    function roundDate(date) {
+        const m = moment(date)
+        const roundDown = m.startOf('minute')
+        return (roundDown.toString()) // outputs Tue Feb 17 2017 12:01:00 GMT+0000
+
+    }
+
+    function dbUpdate(notification) {
+        return new Promise((resolve, reject) => {
+            if (notification.notificationType === 'notification') {
+                const newNotification = new NotificationModel();
+                for (const prop in notification) {
+                    newNotification[prop] = notification[prop]
+                }
+                newNotification.save(function (err) {
+                    if (err) return reject(err)
+
+                    return resolve()
+                });
+            } else {
+                NotificationModel.findByIdAndUpdate(notification._id, { notificationType: notification.notificationType, lastExecute: notification.lastExecute }, (err, docs) => {
+                    if (err) {
+                        reject(err)
+                    }
+                    else {
+                        console.log("Updated User : ", docs)
+                        resolve()
+                    }
+                })
+            }
+
+        })
+    }
 
     function addToFailed(id) {
         queue = queue.filter(queueNotification => {
             if (id === queueNotification.id) {
-                failedNotifications.push(queueNotification)
+                //failedNotifications.push(queueNotification)
+                const content = JSON.stringify(queueNotification) + '\n'
+
+                fs.appendFile('failed.txt', content, err => {
+                    if (err) {
+                        console.error(err)
+                    }
+                })
                 return false
             } else {
                 return true
@@ -303,27 +297,38 @@ function startServer(auth) {
         })
     }
 
-    function checkForQueueToContinue() {
+    function checkForQueueToContinue() {        
         if (queue.length) {
-            const notification = queue.shift()
-
+            const notification = queue.shift()            
             startWhatsAppProcess(notification).then(
-                mssg => {
+                async mssg => {
                     queue = queue.filter(queueNotification => notification.id !== queueNotification.id)
+                    try {
+                        const date = new Date()
 
-                    checkForQueueToContinue()
+                        notification.lastExecute = roundDate(date)
+                        await dbUpdate(notification)
+                        checkForQueueToContinue()
+                    }
+                    catch (error) {
+                        return console.log(error)
+                    }
+
                 }
             ).catch(err => {
 
                 checkForQueueToContinue()
 
             })
-        }else{
+        } else {
             console.log('Finished all')
         }
     }
 
     app.listen(3000, () => console.log('Server running'))
-
-
 }
+
+
+startServer()
+
+
